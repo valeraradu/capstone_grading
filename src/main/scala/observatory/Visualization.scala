@@ -76,62 +76,12 @@ object Visualization extends VisualizationInterface {
       x <- 0 to 359
       y <- 0 to 179
     } yield {
-      val color = interpolateColor(colors, predictTemperature(temperatures, coordToGeo(x, y)))
-        Pixel(color.red, color.green, color.blue, 255)
+      val color = interpolateColor(colors, predictTemperature(temperatures, DistanceCalculatorImpl.coordToGeo(x, y)))
+        Pixel(color.red, color.green, color.blue, 127)
     }
 
     Image(360, 180, pixels.toArray)
 
-  }
-
-  //https://stackoverflow.com/questions/14329691/convert-latitude-longitude-point-to-a-pixels-x-y-on-mercator-projection
-  //https://github.com/mraad/WebMercator/blob/master/src/main/java/com/esri/WebMercator.java
-  /*
-      Pseudo code example, so this can be adapted to every programming language.
-
-      latitude    = 41.145556; // (φ)
-      longitude   = -73.995;   // (λ)
-
-      mapWidth    = 200;
-      mapHeight   = 100;
-
-      // get x value
-      x = (longitude+180)*(mapWidth/360)
-
-      // convert from degrees to radians
-      latRad = latitude*PI/180;
-
-      // get y value
-      mercN = ln(tan((PI/4)+(latRad/2)));
-      y     = (mapHeight/2)-(mapWidth*mercN/(2*PI));
-  */
-  def geoToCoord(location: Location): (Int, Int) = {
-    val mapWidth    = 360;
-    val mapHeight   = 180;
-
-    val x = (location.lon + 180)*(mapWidth/360)
-
-    // convert from degrees to radians
-    //val latRad = location.lat * Math.PI/180;
-
-    // get y value
-    //val mercN = Math.log(Math.tan((Math.PI/4)+(latRad/2)))
-    //val y     = (mapHeight/2)-(mapHeight*mercN/(2*Math.PI));
-
-    //https://github.com/mfeldheim/hermap/blob/master/src/Geo/Projection.php
-    //'x' => ($lng+180)*($width/360),
-    //'y' => ($height/2)-($width*log(tan((M_PI/4)+(($lat*M_PI/180)/2)))/(2*M_PI))
-    //val y = (mapHeight/2)-(mapWidth*Math.log(Math.tan((Math.PI/4)+((location.lat*Math.PI/180)/2)))/(2*Math.PI))
-    val y  = mapHeight/2 -((location.lat * mapHeight) / 180)
-    (x.toInt, y.toInt)
-  }
-
-  def coordToGeo(x: Int, y: Int): Location = {
-    val mapWidth    = 360;
-    val mapHeight   = 180;
-    val lon = x/(mapWidth/360)-180
-    val lat = -((y - mapHeight/2)*180)/mapHeight
-    Location(lat, lon)
   }
 
 }

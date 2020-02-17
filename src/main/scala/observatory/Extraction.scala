@@ -43,12 +43,12 @@ object Extraction extends ExtractionInterface {
     val stations = readDS(stationsFile)
     val temperatures = readDS(temperaturesFile)
 
-    stations.filter(station => !station.isNullAt(2) && !station.isNullAt(3)).join(temperatures,
-      stations(stations.columns(0)) <=> temperatures(temperatures.columns(0))
-        && stations(stations.columns(1)) <=> temperatures(temperatures.columns(1)))
+    stations.filter(station => !station.isNullAt(2) && !station.isNullAt(3))
+      .join(temperatures, stations(stations.columns(0)) <=> temperatures(temperatures.columns(0))
+                       && stations(stations.columns(1)) <=> temperatures(temperatures.columns(1)))
       .collect.toList
     .map(value => (LocalDate.of(year, value.getInt(6), value.getInt(7)),
-      Location(value.getDouble(2), value.getDouble(3)), Math.round(((value.getDouble(8) - 32.0) * 5.0/9 ) * 100) / 100.0 ))
+      Location(value.getDouble(2), value.getDouble(3)), Math.round(((value.get(8).asInstanceOf[Double] - 32.0) * 5.0/9 ) * 100) / 100.0 ))
 
   }
 

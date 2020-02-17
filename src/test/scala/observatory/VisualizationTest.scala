@@ -1,5 +1,6 @@
 package observatory
 
+import observatory.util.DistanceCalculatorImpl
 import org.junit.Assert._
 import org.junit.{Rule, Test}
 
@@ -54,18 +55,18 @@ trait VisualizationTest extends MilestoneSuite {
   }
 
   @Test def `test coordToGeo x:0 y:0 is Location(90, -180)`: Unit = {
-    assert(Visualization.coordToGeo(0, 0) == Location(90, -180))
+    assert(DistanceCalculatorImpl.coordToGeo(0, 0) == Location(90, -180))
   }
 
   @Test def `test geoToCoord Location(90, -180) is x:90, y:180`: Unit = {
-    assert(Visualization.geoToCoord(Location(90, -180)) == (0, 0))
+    assert(DistanceCalculatorImpl.geoToCoord(Location(90, -180)) == (0, 0))
   }
 
   @Test def `test coordToGeo to geoToCoord and back is equivalent`: Unit = {
     val x =  Random.nextInt(360)
     val y =  Random.nextInt(180)
-    val geo = Visualization.coordToGeo(x, y)
-    assert(Visualization.geoToCoord(geo) == (x, y))
+    val geo = DistanceCalculatorImpl.coordToGeo(x, y)
+    assert(DistanceCalculatorImpl.geoToCoord(geo) == (x, y))
   }
 
 }
