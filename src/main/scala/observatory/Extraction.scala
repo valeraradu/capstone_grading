@@ -4,6 +4,7 @@ import java.time.LocalDate
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.types.{DoubleType, IntegerType, StructField, StructType}
 
 import scala.io.Source
 
@@ -33,22 +34,33 @@ object Extraction extends ExtractionInterface {
                          stationsFile: String,
                          temperaturesFile: String): Iterable[(LocalDate, Location, Temperature)] = {
 
-    def readDS(path: String): DataFrame = {
+    def readDS(path: String, schema: StructType): DataFrame = {
       spark.read
         .option("header", "false")
-        .option("inferSchema", "true")
+        .schema(schema)
         .csv(Source.fromInputStream(this.getClass.getResourceAsStream(path), "utf-8").getLines().toList.toDS())
     }
 
-    val stations = readDS(stationsFile)
-    val temperatures = readDS(temperaturesFile)
+    val stations = readDS(stationsFile, StructType(List(
+      StructField("STN", IntegerType),
+      StructField("WBAN", IntegerType),
+      StructField("lat", DoubleType),
+      StructField("lon", DoubleType))))
 
-    stations.filter(station => !station.isNullAt(2) && !station.isNullAt(3))
-      .join(temperatures, stations(stations.columns(0)) <=> temperatures(temperatures.columns(0))
-                       && stations(stations.columns(1)) <=> temperatures(temperatures.columns(1)))
-      .collect.toList
-    .map(value => (LocalDate.of(year, value.getInt(6), value.getInt(7)),
-      Location(value.getDouble(2), value.getDouble(3)), Math.round(((value.get(8).asInstanceOf[Double] - 32.0) * 5.0/9 ) * 100) / 100.0 ))
+    val temperatures = readDS(temperaturesFile, StructType(List(
+      StructField("STN", IntegerType),
+      StructField("WBAN", IntegerType),
+      StructField("month", IntegerType),
+      StructField("day", IntegerType),
+      StructField("temp", DoubleType)))
+    )
+
+    stations.filter(stations("lat").isNotNull && stations("lon").isNotNull)
+      .join(temperatures, stations("STN") <=> temperatures("STN") && stations("WBAN") <=> temperatures("WBAN"))
+      .collect.map(
+        value => (LocalDate.of(year, value.getInt(6), value.getInt(7)),
+        Location(value.getDouble(2), value.getDouble(3)), Math.round(((value.getDouble(8) - 32.0) * 5.0/9 ) * 100) / 100.0 )
+      )
 
   }
 

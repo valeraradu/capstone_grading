@@ -1,5 +1,7 @@
 package observatory
 
+import observatory.LayerName.{Deviations, Temperatures}
+
 /**
   * 6th (and last) milestone: user interface polishing
   */
@@ -7,9 +9,25 @@ object Interaction2 extends Interaction2Interface {
 
   /**
     * @return The available layers of the application
+    *
+    *         Temperature (°C)	Red	Green	Blue
+    *         7	                0	  0	    0
+    *         4	                255	0	    0
+    *         2	                255	255	  0
+    *         0	                255	255	255
+    *         -2	              0	  255	255
+    *         -7	              0	  0	  255
     */
   def availableLayers: Seq[Layer] = {
-    ???
+    val colorScheme = Seq((7.0, Color(0,0,0)),
+                          (4.0, Color(255,0,0)),
+                          (2.0, Color(255,255,0)),
+                          (0.0, Color(255,255,255)),
+                          (-2.0, Color(0,255,255)),
+                          (-7.0, Color(0,0,255))
+    )
+    Seq(Layer(Temperatures, colorScheme, Range(1975, 2015)),
+      Layer(Deviations, colorScheme, Range(1975, 2015)))
   }
 
   /**

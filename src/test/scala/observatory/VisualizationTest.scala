@@ -62,11 +62,17 @@ trait VisualizationTest extends MilestoneSuite {
     assert(DistanceCalculatorImpl.geoToCoord(Location(90, -180)) == (0, 0))
   }
 
+  @Test def `test geoToCoord Location((-89, 179)) is x:359, y:179`: Unit = {
+    assert(DistanceCalculatorImpl.geoToCoord(Location(-89, 179)) == (359, 179))
+  }
+
   @Test def `test coordToGeo to geoToCoord and back is equivalent`: Unit = {
     val x =  Random.nextInt(360)
     val y =  Random.nextInt(180)
     val geo = DistanceCalculatorImpl.coordToGeo(x, y)
     assert(DistanceCalculatorImpl.geoToCoord(geo) == (x, y))
   }
+
+
 
 }

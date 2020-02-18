@@ -10,9 +10,9 @@ object Manipulation extends ManipulationInterface {
     * @return A function that, given a latitude in [-89, 90] and a longitude in [-180, 179],
     *         returns the predicted temperature at this location
     */
-  def makeGrid(temperatures: Iterable[(Location, Temperature)]): GridLocation => Temperature = {
-    ???
-  }
+  def makeGrid(temperatures: Iterable[(Location, Temperature)]): GridLocation => Temperature =
+    (grid: GridLocation) => Visualization.predictTemperature(temperatures, Location(grid.lat, grid.lon))
+
 
   /**
     * @param temperaturess Sequence of known temperatures over the years (each element of the collection
@@ -20,7 +20,9 @@ object Manipulation extends ManipulationInterface {
     * @return A function that, given a latitude and a longitude, returns the average temperature at this location
     */
   def average(temperaturess: Iterable[Iterable[(Location, Temperature)]]): GridLocation => Temperature = {
-    ???
+    grid: GridLocation => makeGrid(temperaturess.map{case head :: tail =>
+      (head._1, (head._2  + tail.map(_._2).sum) / tail.size + 1)
+    })(grid)
   }
 
   /**
@@ -29,7 +31,7 @@ object Manipulation extends ManipulationInterface {
     * @return A grid containing the deviations compared to the normal temperatures
     */
   def deviation(temperatures: Iterable[(Location, Temperature)], normals: GridLocation => Temperature): GridLocation => Temperature = {
-    ???
+    (grid: GridLocation) => normals(grid) - makeGrid(temperatures)(grid)
   }
 
 
