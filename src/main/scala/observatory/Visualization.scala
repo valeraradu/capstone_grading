@@ -47,21 +47,29 @@ object Visualization extends VisualizationInterface {
     */
   def interpolateColor(points: Iterable[(Temperature, Color)], value: Temperature): Color = {
 
-    val(lower, upper) = points.foldLeft(((0.0, Color(-1, -1, -1)), (9999.0, Color(-1, -1, -1))))((minmaxcolors, point) => {
-      (if( point._1 <= value && point._1 >  minmaxcolors._1._1 ) point else minmaxcolors._1,
-      if( point._1 >= value && point._1 <  minmaxcolors._2._1 ) point else minmaxcolors._2)
+    val(lower, upper) = points.foldLeft(
+      ((Double.MinValue, Color(-1, -1, -1)),
+      (Double.MaxValue, Color(-1, -1, -1)))
+    )((minmaxcolors, point) => {
+      minmaxcolors match {
+        case ((mintemp: Temperature, mincolor: Color),(maxtemp: Temperature, maxcolor: Color)) =>
+          (if( point._1 <= value && point._1 >  mintemp ) point else (mintemp, mincolor),
+          if( point._1 >= value && point._1 < maxtemp ) point else (maxtemp, maxcolor))
+      }
+
     })
 
-    if(lower == upper){
-      lower._2
-    } else {
-      val weightLower = (value - lower._1)/(upper._1 - lower._1)
-      val weightUper = (upper._1 - value)/(upper._1 - lower._1)
+    if(lower == upper) lower._2
+    else if (lower._1 == Double.MinValue) upper._2
+    else if (upper._1 == Double.MaxValue) lower._2
 
-      Color((lower._2.red * weightLower + upper._2.red * weightUper).toInt,
-        (lower._2.green * weightLower + upper._2.green * weightUper).toInt,
-        (lower._2.blue * weightLower + upper._2.blue * weightUper).toInt)
+    else {
+      val weightLower = (1.0 * upper._1 - value)/(upper._1 - lower._1)
+      val weightUper = (1.0 * value - lower._1)/(upper._1 - lower._1)
 
+      Color(Math.round((lower._2.red * weightLower + upper._2.red * weightUper).toInt),
+            Math.round((lower._2.green * weightLower + upper._2.green * weightUper).toInt),
+            Math.round(lower._2.blue * weightLower + upper._2.blue * weightUper).toInt)
     }
   }
 

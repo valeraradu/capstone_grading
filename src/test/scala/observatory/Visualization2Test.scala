@@ -11,5 +11,14 @@ trait Visualization2Test extends MilestoneSuite {
     assert(image.width == 256)
   }
 
+  @Test def `interpolated Expected 0E-23 (d00 = 0.0, d01 = 0.0, d10 = 0.0, d11 = -1.0021297162650767E-5, x = 0.0, y = 0.0)`: Unit = {
+    val biinterpolated = Visualization2.bilinearInterpolation(CellPoint(0.0, 0.0), 0.0, 0.0, 0.0 , 0.0)
+    assert(biinterpolated == 0E-23, s"biinterpolated expected 0E-23 but was ${biinterpolated}")
+  }
+
+  @Test def `interpolated Expected 1.52587890625E-7 (d00 = 0.0, d01 = 0.0, d10 = 0.0, d11 = 1.52587890625E-5, x = 0.1, y = 0.1)`: Unit = {
+    val biinterpolated = Visualization2.bilinearInterpolation(CellPoint(0.1, 0.1), 0.0, 0.0, 0.0 , 1.52587890625E-5)
+    assert(biinterpolated == 1.52587890625E-7, s"biinterpolated expected 1.52587890625E-7 but was ${biinterpolated}")
+  }
 
 }

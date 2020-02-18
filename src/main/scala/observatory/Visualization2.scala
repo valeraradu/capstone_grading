@@ -30,7 +30,7 @@ object Visualization2 extends Visualization2Interface {
   ): Temperature = {
 
     def linearInterpolation(distance: Double, d0: Temperature, d1: Temperature): Double = {
-      d0*distance + d1*(1-distance)
+      d0*(1-distance) + d1*distance
     }
 
     linearInterpolation(point.y, linearInterpolation(point.x, d00, d10)

@@ -35,6 +35,17 @@ trait VisualizationTest extends MilestoneSuite {
     )
   }
 
+  @Test def `exceeding the greatest value of a color scale should return the color associated with the greatest value (2pts)`: Unit = {
+    val color = Visualization.interpolateColor(List((10, Color(100, 100, 100)), (20, Color(50, 50, 50))), 30.0)
+    assert(color == Color(50, 50, 50), s"expected Color(50, 50, 50) but it was $color")
+  }
+
+  @Test def `predicted color: Color(63,0,191). Expected: Color(191,0,64) (scale = List((-1.0,Color(255,0,0)), (0.0,Color(0,0,255))), value = -0.75)`:
+  Unit = {
+    val color = Visualization.interpolateColor(List((-1.0,Color(255,0,0)), (0.0,Color(0,0,255))), -0.75)
+    assert(color == Color(191,0,64), s"expected Color(191,0,64) but it was $color")
+  }
+
 
   @Test def `test visualize produces an image of 360×180 pixels`: Unit = {
     val image = Visualization.visualize(List(), List())
