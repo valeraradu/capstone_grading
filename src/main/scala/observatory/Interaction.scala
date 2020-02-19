@@ -3,6 +3,8 @@ package observatory
 import com.sksamuel.scrimage.{Image, Pixel}
 import observatory.util.DistanceCalculatorImpl
 import Visualization._
+import observatory.Interaction.zoomTile
+
 import scala.math._
 
 /**
@@ -66,7 +68,23 @@ object Interaction extends InteractionInterface {
     yearlyData: Iterable[(Year, Data)],
     generateImage: (Year, Tile, Data) => Unit
   ): Unit = {
-    ???
+    yearlyData.foreach(data => {
+      (Tile(0,0,0) +: zoomTile(Tile(0,0,0), 3)).toList
+        .foreach(tile => { generateImage(data._1, tile, data._2)})
+    })
+  }
+
+  def zoomTile(tile: Tile, depth: Int): Seq[Tile] = {
+    if (depth <= 0) {
+      Seq()
+    } else {
+      for {
+        y <- tile.y * 2 to tile.y * 2 + 1
+        x <- tile.x * 2 to tile.x * 2 + 1
+      } yield {
+        Tile(x, y, tile.zoom + 1) +: zoomTile(Tile(x, y, tile.zoom + 1), depth-1)
+      }
+      }.flatten
   }
 
 }
