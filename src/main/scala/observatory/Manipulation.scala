@@ -20,9 +20,13 @@ object Manipulation extends ManipulationInterface {
     * @return A function that, given a latitude and a longitude, returns the average temperature at this location
     */
   def average(temperaturess: Iterable[Iterable[(Location, Temperature)]]): GridLocation => Temperature = {
-    grid: GridLocation => makeGrid(temperaturess.map{case head :: tail =>
-      (head._1, (head._2  + tail.map(_._2).sum) / tail.size + 1)
-    })(grid)
+    grid: GridLocation =>
+     val temps =  temperaturess.map(temp => Visualization.predictTemperature(temp, toLocation(grid)))
+      temps.foldLeft(0.0)((t1, t2) => t1 + t2)/temps.size
+  }
+
+   def toLocation(gridLocation: GridLocation): Location = {
+    Location(gridLocation.lat, gridLocation.lon)
   }
 
   /**
